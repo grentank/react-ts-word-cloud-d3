@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../saga/rootSaga';
 import wordsReducer from './slices/wordsSlice';
+import userReducer from './slices/userSlice';
 
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
   reducer: {
     words: wordsReducer,
+    user: userReducer
   },
   middleware: (defaultMW) => defaultMW().concat(sagaMiddleware),
 });

@@ -1,9 +1,11 @@
-import type {
+import {
+  SOCKET_SEND_ANSWER,
   WsCloseType,
   WsConnectType,
   WsInitType,
   WsMessageSendType,
   WsMessageSetType,
+  WsSendAnswer,
 } from '../../types/wsTypes';
 import {
   SOCKET_CONNECT,
@@ -32,5 +34,10 @@ export const wsMessageSetAction = (payload: string): WsMessageSetType => ({
 
 export const wsMessageSendAction = (payload: string): WsMessageSendType => ({
   type: SOCKET_MESSAGE_SEND,
+  payload,
+});
+
+export const wsSendAnswer = (payload: string): WsSendAnswer => ({
+  type: SOCKET_SEND_ANSWER,
   payload,
 });

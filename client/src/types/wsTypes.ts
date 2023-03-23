@@ -25,9 +25,16 @@ export type WsMessageSendType = {
   payload: string;
 };
 
+export const SOCKET_SEND_ANSWER = 'SOCKET_SEND_ANSWER';
+export type WsSendAnswer = {
+  type: typeof SOCKET_SEND_ANSWER;
+  payload: string;
+};
+
 export type WsActionTypes =
   | WsInitType
   | WsCloseType
   | WsMessageSendType
   | WsMessageSetType
-  | WsConnectType;
+  | WsConnectType
+  | WsSendAnswer;

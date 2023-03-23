@@ -1,30 +1,74 @@
-import React, { useState } from 'react';
-import WordCloud from './components/WordCloud/WordCloud';
-import type { WordType } from './types/wordTypes';
+import { Container } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import PrivateRouter from './components/HOC/PrivateRouter';
+import Spinner from './components/HOC/Spinner';
+import HomePage from './components/pages/HomePage/HomePage';
+import SignupPage from './components/pages/SignupPage/SignupPage';
+import WordCloudPage from './components/pages/WordCloudPage/WordCloudPage';
+import NavBar from './components/ui/NavBar';
+import { checkUserActionThunk } from './features/redux/asyncThunks/userThunks';
+import { useAppDispatch, useAppSelector } from './features/redux/hooks';
+import { AUTHORIZED, GUEST, LOADING } from './types/userTypes';
+import { wsInitAction } from './features/actions/wsActions';
 
 function App(): JSX.Element {
-  const [dataWords, setDataWords] = useState<WordType[]>([]);
+  const user = useAppSelector((store) => store.user);
 
-  const [value, setValue] = useState('');
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    void dispatch(checkUserActionThunk());
+  }, []);
+
+  useEffect(() => {
+    if (user.status !== LOADING) dispatch(wsInitAction());
+  }, [user]);
 
   return (
-    <div className="App">
-      <input value={value} onChange={(e) => setValue(e.target.value)} />
-      <button
-        type="button"
-        onClick={() => {
-          setDataWords((prev) => [
-            { text: value, size: Math.floor(Math.random() * 40) + 10 },
-            ...prev,
-          ]);
-          setValue('');
-        }}
-      >
-        add
-      </button>
-      <WordCloud words={dataWords} />
-    </div>
+    <Spinner spinning={user.status === LOADING}>
+      <Container>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/wordcloud"
+            element={
+              <PrivateRouter isAllowed={user.status === AUTHORIZED} redirectTo="/">
+                <WordCloudPage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/answers"
+            element={
+              <PrivateRouter isAllowed={user.status === GUEST} redirectTo="/">
+                <WordCloudPage />
+              </PrivateRouter>
+            }
+          />
+        </Routes>
+      </Container>
+    </Spinner>
   );
+
+  // <div className="App">
+  //   <input value={value} onChange={(e) => setValue(e.target.value)} />
+  //   <button
+  //     type="button"
+  //     onClick={() => {
+  //       setDataWords((prev) => [
+  //         { text: value, size: Math.floor(Math.random() * 40) + 10 },
+  //         ...prev,
+  //       ]);
+  //       setValue('');
+  //     }}
+  //   >
+  //     add
+  //   </button>
+  //   <WordCloud words={dataWords} />
+  // </div>
 }
 
 export default App;
