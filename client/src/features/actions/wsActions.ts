@@ -1,5 +1,4 @@
-import {
-  SOCKET_SEND_ANSWER,
+import type {
   WsCloseType,
   WsConnectType,
   WsInitType,
@@ -8,6 +7,7 @@ import {
   WsSendAnswer,
 } from '../../types/wsTypes';
 import {
+  SOCKET_SEND_ANSWER,
   SOCKET_CONNECT,
   SOCKET_MESSAGE_SEND,
   SOCKET_MESSAGE_SET,

@@ -13,7 +13,8 @@ export type WordCloudProps = {
   fontSize?: (arg0: Word) => number;
 };
 
-export default function WordCloud({ words, ...rest }: WordCloudProps): JSX.Element {
+export default function WordCloud({ words: propWords, ...rest }: WordCloudProps): JSX.Element {
+  const words = JSON.parse(JSON.stringify(propWords)) as WordType[];
   useEffect(() => {
     const layout = prepareLayout({ words, ...rest });
     const readyLayout = layout.on('end', (layoutWords: LayoutWordType[]) =>

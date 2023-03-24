@@ -3,17 +3,16 @@ import React from 'react';
 
 export default function HomePage(): JSX.Element {
   return (
-    <Box sx={{
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      mt: 3,
-    }}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        mt: 3,
+      }}
     >
-      <Typography>
-        Welcome to CatSpace!
-      </Typography>
+      <Typography>Go to Answers</Typography>
     </Box>
   );
 }

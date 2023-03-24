@@ -7,6 +7,7 @@ import {
   logouUserActionThunk,
   signUpUserActionThunk,
 } from '../asyncThunks/userThunks';
+import type { WordType } from '../../../types/wordTypes';
 
 const initialState: UserType = {
   status: LOADING,
@@ -18,6 +19,9 @@ export const userSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<UserType>) => action.payload,
     logoutUser: (state) => ({ status: GUEST, answers: [] }),
+    addUserAnswer: (state, action: PayloadAction<WordType['text']>) => {
+      if (state.status === GUEST) state.answers.push(action.payload);
+    },
   },
   extraReducers(builder) {
     builder

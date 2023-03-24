@@ -13,7 +13,7 @@ export const wordsSlice = createSlice({
   initialState,
   reducers: {
     addWordToDisplayedWords: (state, action: PayloadAction<WordType['text']>) => {
-      const foundWord = state.displayedWords.find((word) => word.text === action.payload);
+      const foundWord = state.displayedWords.find((word) => word.text.toLowerCase() === action.payload.toLowerCase());
       if (foundWord) foundWord.size += 1;
       else state.displayedWords.push({ text: action.payload, size: 1 });
     },

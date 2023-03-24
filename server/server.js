@@ -7,6 +7,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const authRouter = require('./routes/authRouter');
 require('dotenv').config();
+const { User, Answer } = require('./db/models');
 
 const FileStore = store(session);
 const PORT = 3001;
@@ -51,22 +52,22 @@ server.on('upgrade', (request, socket, head) => {
   socket.on('error', onSocketError);
 
   sessionConfig(request, {}, () => {
-    if (!request.session.user) {
-      request.session.user = {
-        // Если не авторизован, ставим guest true и id присваиваем из сессии
-        guest: true,
-        id: request.session.id,
-      };
-    }
-
-    if (!request.session.user.guest) {
-      request.session.user.host = true;
-    }
     // if (!request.session.user) {
-    // socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-    // socket.destroy();
-    // return;
+    //   request.session.user = {
+    //     // Если не авторизован, ставим guest true и id присваиваем из сессии
+    //     guest: true,
+    //     id: request.session.id,
+    //   };
     // }
+
+    // if (!request.session.user.guest) {
+    //   request.session.user.host = true;
+    // }
+    if (!request.session.user) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
 
     console.log('Session is parsed!');
 
@@ -86,20 +87,28 @@ wss.on('connection', (ws, request) => {
 
   ws.on('error', console.error);
 
-  setTimeout(() => {
-    map.get('host').ws.send(
-      JSON.stringify({
-        type: 'TIMEOUT_ACTION',
-        payload: 'HELLO',
-      }),
-    );
-  }, 3000);
+  ws.on('message', async (message) => {
+    const { type, payload } = JSON.parse(message);
 
-  ws.on('message', (message) => {
+    const [curUser] = await User.findOrCreate({
+      where: {
+        sessionId: request.session.id,
+      },
+    });
+
+    await Answer.create({
+      body: payload,
+      authorId: curUser.id,
+    });
+
+    // request.session.user = {
+    //   ...request.session.user,
+    //   answers: `${request.session.user.answers};${payload}`,
+    // };
     map.get('host').ws.send(
       JSON.stringify({
-        type: 'TEST_ACTION',
-        payload: 'NEW WORD',
+        type: 'words/addWordToDisplayedWords',
+        payload,
       }),
     );
 

@@ -28,10 +28,10 @@ export default function NavBar(): JSX.Element {
           <HomeIcon />
           Home
         </Button>
-        <Button color="inherit" component={Link} to="/signup">
+        {/* <Button color="inherit" component={Link} to="/signup">
           <AccountCircleIcon />
           Sign in
-        </Button>
+        </Button> */}
         <Button color="inherit" component={Link} to="/wordcloud">
           <SettingsIcon />
           Cloud

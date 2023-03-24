@@ -11,6 +11,7 @@ import { checkUserActionThunk } from './features/redux/asyncThunks/userThunks';
 import { useAppDispatch, useAppSelector } from './features/redux/hooks';
 import { AUTHORIZED, GUEST, LOADING } from './types/userTypes';
 import { wsInitAction } from './features/actions/wsActions';
+import AnswersPage from './components/pages/AnswersPage/AnswersPage';
 
 function App(): JSX.Element {
   const user = useAppSelector((store) => store.user);
@@ -44,7 +45,7 @@ function App(): JSX.Element {
             path="/answers"
             element={
               <PrivateRouter isAllowed={user.status === GUEST} redirectTo="/">
-                <WordCloudPage />
+                <AnswersPage />
               </PrivateRouter>
             }
           />

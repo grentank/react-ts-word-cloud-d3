@@ -1,9 +1,9 @@
 import type { EventChannel } from 'redux-saga';
 import { END, eventChannel } from 'redux-saga';
-import { ActionPattern, fork, TakeEffect } from 'redux-saga/effects';
-import { takeEvery, call, put, take } from 'redux-saga/effects';
-import { SOCKET_SEND_ANSWER, WsActionTypes } from '../../types/wsTypes';
-import { SOCKET_CLOSE, SOCKET_INIT, SOCKET_CONNECT } from '../../types/wsTypes';
+import type { ActionPattern, TakeEffect } from 'redux-saga/effects';
+import { fork, takeEvery, call, put, take } from 'redux-saga/effects';
+import type { WsActionTypes } from '../../types/wsTypes';
+import { SOCKET_SEND_ANSWER, SOCKET_CLOSE, SOCKET_INIT, SOCKET_CONNECT } from '../../types/wsTypes';
 import { wsCloseAction, wsConnectAction, wsInitAction } from '../actions/wsActions';
 
 function createSocketChannel(socket: WebSocket): EventChannel<WsActionTypes> {
@@ -51,7 +51,7 @@ function* wsWorker(): Generator<unknown, void, WsActionTypes> {
     try {
       const backAction = yield take(socketChannel as unknown as ActionPattern<WsActionTypes>);
       console.log('backAction', backAction);
-      put(backAction);
+      yield put(backAction);
 
       //   switch (backAction.type) {
       //     case SOCKET_CONNECT:
