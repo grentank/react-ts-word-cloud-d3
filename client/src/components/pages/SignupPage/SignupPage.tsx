@@ -33,7 +33,7 @@ export default function SignupPage(): JSX.Element {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Enter the secret passphrase to login as admin
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -45,25 +45,8 @@ export default function SignupPage(): JSX.Element {
               name="secret"
               autoFocus
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-            />
             <LoadingButton type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Sign In
+              Enter
             </LoadingButton>
           </Box>
         </Box>

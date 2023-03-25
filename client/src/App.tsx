@@ -32,7 +32,14 @@ function App(): JSX.Element {
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/signup"
+            element={
+              <PrivateRouter isAllowed={user.status === GUEST} redirectTo="/wordcloud">
+                <SignupPage />
+              </PrivateRouter>
+            }
+          />
           <Route
             path="/wordcloud"
             element={

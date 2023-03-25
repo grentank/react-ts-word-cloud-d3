@@ -15,8 +15,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '../../features/redux/hooks';
+import { AUTHORIZED, GUEST } from '../../types/userTypes';
 
 export default function NavBar(): JSX.Element {
+  const user = useAppSelector((store) => store.user);
   return (
     <AppBar position="static">
       <Toolbar>
@@ -32,14 +35,14 @@ export default function NavBar(): JSX.Element {
           <AccountCircleIcon />
           Sign in
         </Button> */}
-        <Button color="inherit" component={Link} to="/wordcloud">
+        {user.status === AUTHORIZED && <Button color="inherit" component={Link} to="/wordcloud">
           <SettingsIcon />
           Cloud
-        </Button>
-        <Button color="inherit" component={Link} to="/answers">
+        </Button>}
+        {user.status === GUEST && <Button color="inherit" component={Link} to="/answers">
           <SettingsIcon />
           Answers
-        </Button>
+        </Button>}
       </Toolbar>
     </AppBar>
   );

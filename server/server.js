@@ -5,19 +5,40 @@ const session = require('express-session');
 const store = require('session-file-store');
 const http = require('http');
 const { WebSocketServer } = require('ws');
+// const redis = require('redis');
+// const RedisStore = require('connect-redis').default;
 const authRouter = require('./routes/authRouter');
-require('dotenv').config();
-const { User, Answer } = require('./db/models');
 
+// const RedisStore = connectRedis(session);
+
+// const redisClient = redis.createClient({
+//   // url: 'redis://localhost:6379',
+//   // legacyMode: true,
+//   host: 'localhost',
+//   port: 6379,
+// });
+
+require('dotenv').config();
+
+// const redisClient = redis.createClient();
+// redisClient.connect().catch(console.error);
+
+// Initialize store.
+// const redisStore = new RedisStore({
+//   client: redisClient,
+//   prefix: 'myapp:',
+// });
 const FileStore = store(session);
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const map = new Map();
+map.set('hosts', []);
+map.set('guests', []);
 
 const sessionConfig = session({
   name: 'user_sid',
   secret: process.env.SESSION_SECRET ?? 'wordcloud',
-  resave: true,
+  resave: false,
   store: new FileStore(),
   saveUninitialized: true,
   cookie: {
@@ -34,6 +55,14 @@ app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(sessionConfig);
 app.use(express.static('public'));
+
+app.use((req, res, next) => {
+  if (req.session?.user?.answers) {
+    // req.session?.user?.answers.push('123');
+    console.log('MIDDLEWARE', req.session.user);
+  }
+  next();
+});
 
 // app.use('/api/posts', postRouter);
 app.use('/api/auth', authRouter);
@@ -82,7 +111,7 @@ server.on('upgrade', (request, socket, head) => {
 wss.on('connection', (ws, request) => {
   const { user } = request.session;
 
-  if (user.host) map.set('host', { ws, user });
+  if (user.host) map.get('hosts').push({ ws, user });
   else map.set(user.id, { ws, user });
 
   ws.on('error', console.error);
@@ -90,32 +119,30 @@ wss.on('connection', (ws, request) => {
   ws.on('message', async (message) => {
     const { type, payload } = JSON.parse(message);
 
-    const [curUser] = await User.findOrCreate({
-      where: {
-        sessionId: request.session.id,
-      },
-    });
-
-    await Answer.create({
-      body: payload,
-      authorId: curUser.id,
-    });
+    // const currentAnswers = request.session.user.answers;
 
     // request.session.user = {
     //   ...request.session.user,
-    //   answers: `${request.session.user.answers};${payload}`,
+    //   answers: [...currentAnswers, payload],
     // };
-    map.get('host').ws.send(
-      JSON.stringify({
-        type: 'words/addWordToDisplayedWords',
-        payload,
-      }),
-    );
 
-    //
-    // Here we can now use session parameters.
-    //
-    // console.log(`Received message ${message} from user ${id}`);
+    request.session.user.answers.push(payload);
+    request.session.save((err) => {
+      if (err) {
+        console.error('Failed to save session:', err);
+      } else {
+        console.log('Session saved successfully');
+      }
+    });
+
+    map.get('hosts').forEach((host) => {
+      host.ws.send(
+        JSON.stringify({
+          type: 'words/addWordToDisplayedWords',
+          payload,
+        }),
+      );
+    });
   });
 
   ws.on('close', () => {
