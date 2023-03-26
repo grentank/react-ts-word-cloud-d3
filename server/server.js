@@ -5,29 +5,9 @@ const session = require('express-session');
 const store = require('session-file-store');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-// const redis = require('redis');
-// const RedisStore = require('connect-redis').default;
+require('dotenv').config();
 const authRouter = require('./routes/authRouter');
 
-// const RedisStore = connectRedis(session);
-
-// const redisClient = redis.createClient({
-//   // url: 'redis://localhost:6379',
-//   // legacyMode: true,
-//   host: 'localhost',
-//   port: 6379,
-// });
-
-require('dotenv').config();
-
-// const redisClient = redis.createClient();
-// redisClient.connect().catch(console.error);
-
-// Initialize store.
-// const redisStore = new RedisStore({
-//   client: redisClient,
-//   prefix: 'myapp:',
-// });
 const FileStore = store(session);
 const PORT = process.env.PORT || 3001;
 
@@ -51,22 +31,11 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(sessionConfig);
 app.use(express.static('public'));
 
-app.use((req, res, next) => {
-  if (req.session?.user?.answers) {
-    // req.session?.user?.answers.push('123');
-    console.log('MIDDLEWARE', req.session.user);
-  }
-  next();
-});
-
-// app.use('/api/posts', postRouter);
 app.use('/api/auth', authRouter);
-// app.use('/api/word', wordRouter);
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ clientTracking: false, noServer: true });
@@ -89,9 +58,6 @@ server.on('upgrade', (request, socket, head) => {
     //   };
     // }
 
-    // if (!request.session.user.guest) {
-    //   request.session.user.host = true;
-    // }
     if (!request.session.user) {
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();

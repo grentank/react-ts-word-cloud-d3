@@ -35,14 +35,24 @@ export default function NavBar(): JSX.Element {
           <AccountCircleIcon />
           Sign in
         </Button> */}
-        {user.status === AUTHORIZED && <Button color="inherit" component={Link} to="/wordcloud">
-          <SettingsIcon />
-          Cloud
-        </Button>}
-        {user.status === GUEST && <Button color="inherit" component={Link} to="/answers">
-          <SettingsIcon />
-          Answers
-        </Button>}
+        {user.status === AUTHORIZED && (
+          <>
+            <Button color="inherit" component={Link} to="/wordcloud">
+              <SettingsIcon />
+              Cloud
+            </Button>
+            <Button color="inherit" component={Link} to="/edit">
+              <SettingsIcon />
+              Edit
+            </Button>
+          </>
+        )}
+        {user.status === GUEST && (
+          <Button color="inherit" component={Link} to="/answers">
+            <SettingsIcon />
+            Answers
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

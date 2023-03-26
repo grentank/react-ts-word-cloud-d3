@@ -34,3 +34,8 @@ export type WordsSliceType = {
   allQuestions: QuestionType[];
   currentQuestion: number;
 };
+
+export type EditQuestionFormType = {
+  index: number;
+  question: QuestionType['question'];
+};

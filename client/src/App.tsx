@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from './features/redux/hooks';
 import { AUTHORIZED, GUEST, LOADING } from './types/userTypes';
 import { wsInitAction } from './features/actions/wsActions';
 import AnswersPage from './components/pages/AnswersPage/AnswersPage';
+import EditQuestionsPage from './components/pages/EditQuestionsPage/EditQuestionsPage';
 
 function App(): JSX.Element {
   const user = useAppSelector((store) => store.user);
@@ -40,14 +41,10 @@ function App(): JSX.Element {
               </PrivateRouter>
             }
           />
-          <Route
-            path="/wordcloud"
-            element={
-              <PrivateRouter isAllowed={user.status === AUTHORIZED} redirectTo="/">
-                <WordCloudPage />
-              </PrivateRouter>
-            }
-          />
+          <Route element={<PrivateRouter isAllowed={user.status === AUTHORIZED} redirectTo="/" />}>
+            <Route path="/wordcloud" element={<WordCloudPage />} />
+            <Route path='/edit' element={<EditQuestionsPage />} />
+          </Route>
           <Route
             path="/answers"
             element={

@@ -14,7 +14,6 @@ export default function SignupPage(): JSX.Element {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
-    // eslint-disable-next-line no-void
     void dispatch(signUpUserActionThunk(data as UserSubmitFormType));
   };
 

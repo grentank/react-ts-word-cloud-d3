@@ -1,10 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { WordsSliceType, WordType } from '../../../types/wordTypes';
+import type {
+  EditQuestionFormType,
+  QuestionType,
+  WordsSliceType,
+  WordType,
+} from '../../../types/wordTypes';
 
 const initialState: WordsSliceType = {
   displayedWords: [],
-  allQuestions: [],
+  allQuestions: [{ question: 'Введите первый вопрос', answers: [] }],
   currentQuestion: 0,
 };
 
@@ -13,7 +18,9 @@ export const wordsSlice = createSlice({
   initialState,
   reducers: {
     addWordToDisplayedWords: (state, action: PayloadAction<WordType['text']>) => {
-      const foundWord = state.displayedWords.find((word) => word.text.toLowerCase() === action.payload.toLowerCase());
+      const foundWord = state.displayedWords.find(
+        (word) => word.text.toLowerCase() === action.payload.toLowerCase(),
+      );
       if (foundWord) foundWord.size += 1;
       else state.displayedWords.push({ text: action.payload, size: 1 });
     },
@@ -36,6 +43,26 @@ export const wordsSlice = createSlice({
       else currentAnswers.push({ text: action.payload, size: 1 });
       state.displayedWords = currentAnswers;
     },
+    setQuestionTitle: (state, action: PayloadAction<EditQuestionFormType>) => {
+      state.allQuestions[action.payload.index].question = action.payload.question;
+    },
+    addEmptyQuestion: (state) => {
+      state.allQuestions.push({
+        question: 'Введи вопрос',
+        answers: [],
+      });
+    },
+    removeLastQuestion: (state) => {
+      if(state.allQuestions.length <= 1) return;
+      if(state.currentQuestion >= state.allQuestions.length - 1) {
+        state.currentQuestion = state.allQuestions.length - 2;
+      }
+      state.allQuestions.pop();
+    },
+    setCurrentQuestion: (state, action: PayloadAction<number>) => {
+      state.currentQuestion = action.payload;
+      state.displayedWords = state.allQuestions[action.payload].answers;
+    },
   },
 });
 
@@ -45,6 +72,10 @@ export const {
   addWordToCurrentQuestion,
   addWordToDisplayedWords,
   addWordAndDisplay,
+  setQuestionTitle,
+  addEmptyQuestion,
+  removeLastQuestion,
+  setCurrentQuestion,
 } = wordsSlice.actions;
 
 export default wordsSlice.reducer;
