@@ -20,10 +20,12 @@ export default function EditQuestionsPage(): JSX.Element {
           ))}
         </Grid>
         <Button variant="outlined" onClick={() => dispatch(addEmptyQuestion())}>
-          <AddCircleOutlineIcon color="success" />
+          {/* <AddCircleOutlineIcon color="success" /> */}
+          Добавить
         </Button>
         <Button variant="outlined" onClick={() => dispatch(removeLastQuestion())}>
-          <CancelIcon color="error" />
+          {/* <CancelIcon color="error" /> */}
+          Удалить
         </Button>
       </Grid>
       <Grid item xs={4}>

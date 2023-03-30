@@ -39,3 +39,8 @@ export type EditQuestionFormType = {
   index: number;
   question: QuestionType['question'];
 };
+
+export type AnswerType = {
+  questionIndex: number;
+  text: string;
+}

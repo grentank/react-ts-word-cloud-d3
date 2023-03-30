@@ -3,7 +3,13 @@ import { END, eventChannel } from 'redux-saga';
 import type { ActionPattern, TakeEffect } from 'redux-saga/effects';
 import { fork, takeEvery, call, put, take } from 'redux-saga/effects';
 import type { WsActionTypes } from '../../types/wsTypes';
-import { SOCKET_SEND_ANSWER, SOCKET_CLOSE, SOCKET_INIT, SOCKET_CONNECT } from '../../types/wsTypes';
+import {
+  SOCKET_SEND_CURRENT_QUESTION,
+  SOCKET_SEND_ANSWER,
+  SOCKET_CLOSE,
+  SOCKET_INIT,
+  SOCKET_CONNECT,
+} from '../../types/wsTypes';
 import { wsCloseAction, wsConnectAction, wsInitAction } from '../actions/wsActions';
 
 function createSocketChannel(socket: WebSocket): EventChannel<WsActionTypes> {
@@ -41,11 +47,19 @@ function* sendWord(socket: WebSocket): Generator<TakeEffect, void, unknown> {
   }
 }
 
+function* sendCurrentQuestion(socket: WebSocket): Generator<TakeEffect, void, unknown> {
+  while (true) {
+    const message = yield take(SOCKET_SEND_CURRENT_QUESTION);
+    socket.send(JSON.stringify(message));
+  }
+}
+
 function* wsWorker(): Generator<unknown, void, WsActionTypes> {
   const socket = new WebSocket('ws://localhost:3001');
   const socketChannel = yield call(createSocketChannel, socket);
 
   yield fork(sendWord, socket);
+  yield fork(sendCurrentQuestion, socket);
 
   while (true) {
     try {

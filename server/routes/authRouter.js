@@ -12,25 +12,27 @@ authRouter.post('/signin', async (req, res) => {
     email,
     guest: false,
     host: true,
+    currentQuestion: res.locals.currentQuestion,
   };
-  return res.json({ ...req.session.user });
+  return res.json({ ...req.session.user, currentQuestion: res.locals.currentQuestion });
 });
 
 authRouter.get('/check', async (req, res) => {
   if (req.session.user?.host) {
-    return res.json({ ...req.session.user });
+    return res.json({ ...req.session.user, currentQuestion: res.locals.currentQuestion });
   }
   if (req.session.user?.guest) {
-    return res.json({ ...req.session.user });
+    return res.json({ ...req.session.user, currentQuestion: res.locals.currentQuestion });
   }
-  // console.log('creating session');
   req.session.user = {
     id: req.session.id,
     guest: true,
     host: false,
     answers: [],
+    currentQuestion: res.locals.currentQuestion,
   };
-  return res.json({ ...req.session.user });
+  console.log('creating session', req.session.user);
+  return res.json({ ...req.session.user, currentQuestion: res.locals.currentQuestion });
 });
 
 authRouter.post('/logout', (req, res) => {

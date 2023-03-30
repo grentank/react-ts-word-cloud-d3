@@ -12,8 +12,14 @@ const FileStore = store(session);
 const PORT = process.env.PORT || 3001;
 
 const map = new Map();
-map.set('hosts', []);
-map.set('guests', []);
+map.set('config', {
+  hosts: [],
+  guests: [],
+  state: { currentQuestion: 0 },
+});
+// map.set('hosts', []);
+// map.set('guests', []);
+// map.set('state', { currentQuestion: 0 });
 
 const sessionConfig = session({
   name: 'user_sid',
@@ -22,7 +28,7 @@ const sessionConfig = session({
   store: new FileStore(),
   saveUninitialized: true,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 12,
+    maxAge: 1000 * 60 * 30,
     httpOnly: true,
   },
 });
@@ -34,6 +40,10 @@ app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(sessionConfig);
 app.use(express.static('public'));
+app.use((req, res, next) => {
+  res.locals.currentQuestion = map.get('config').state.currentQuestion;
+  next();
+});
 
 app.use('/api/auth', authRouter);
 
@@ -68,22 +78,73 @@ server.on('upgrade', (request, socket, head) => {
 
     socket.removeListener('error', onSocketError);
 
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
-    });
+    if (request.session.user.currentQuestion !== map.get('config').state.currentQuestion) {
+      request.session.user.currentQuestion = map.get('config').state.currentQuestion;
+      console.log(request.session.user);
+      request.session.save((err) => {
+        if (err) console.log('error saving session', err);
+        else {
+          wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+          });
+        }
+      });
+    } else {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
+    }
   });
 });
 
 wss.on('connection', (ws, request) => {
   const { user } = request.session;
 
-  if (user.host) map.get('hosts').push({ ws, user });
-  else map.set(user.id, { ws, user });
+  if (user.host) map.get('config').hosts.push({ ws, user });
+  else map.get('config').guests.push({ ws, user });
+  map.set(user.id, { ws, user });
 
   ws.on('error', console.error);
 
   ws.on('message', async (message) => {
-    const { type, payload } = JSON.parse(message);
+    const parsed = JSON.parse(message);
+    const { type, payload } = parsed;
+    console.log(parsed);
+
+    switch (type) {
+      case 'SOCKET_SEND_ANSWER': {
+        request.session.user.answers.push(payload);
+        request.session.save((err) => {
+          if (err) {
+            console.error('Failed to save session:', err);
+          } else {
+            console.log('Session saved successfully', request.session.user.id);
+          }
+        });
+
+        map.get('config').hosts.forEach((host) => {
+          host.ws.send(
+            JSON.stringify({
+              type: 'words/addWordFromBackend',
+              payload,
+            }),
+          );
+        });
+        break;
+      }
+      case 'SOCKET_SEND_CURRENT_QUESTION': {
+        map.get('config').state.currentQuestion = payload;
+        console.log('map config', map.get('config'));
+
+        break;
+      }
+
+      default:
+        break;
+    }
+    // if (type === 'SOCKET_SEND_ANSWER') {
+
+    // }
 
     // const currentAnswers = request.session.user.answers;
 
@@ -91,24 +152,6 @@ wss.on('connection', (ws, request) => {
     //   ...request.session.user,
     //   answers: [...currentAnswers, payload],
     // };
-
-    request.session.user.answers.push(payload);
-    request.session.save((err) => {
-      if (err) {
-        console.error('Failed to save session:', err);
-      } else {
-        console.log('Session saved successfully');
-      }
-    });
-
-    map.get('hosts').forEach((host) => {
-      host.ws.send(
-        JSON.stringify({
-          type: 'words/addWordToDisplayedWords',
-          payload,
-        }),
-      );
-    });
   });
 
   ws.on('close', () => {

@@ -26,6 +26,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "react/no-array-index-key": "off",
     "no-void": "off",
     "no-param-reassign": "off",
     "react/require-default-props": "off",

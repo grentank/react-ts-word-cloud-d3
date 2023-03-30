@@ -7,7 +7,7 @@ import {
   logouUserActionThunk,
   signUpUserActionThunk,
 } from '../asyncThunks/userThunks';
-import type { WordType } from '../../../types/wordTypes';
+import type { AnswerType, WordType } from '../../../types/wordTypes';
 
 const initialState: UserType = {
   status: LOADING,
@@ -18,8 +18,8 @@ export const userSlice = createSlice({
   initialState: initialState as UserType,
   reducers: {
     setUser: (state, action: PayloadAction<UserType>) => action.payload,
-    logoutUser: (state) => ({ status: GUEST, answers: [] }),
-    addUserAnswer: (state, action: PayloadAction<WordType['text']>) => {
+    logoutUser: (state) => ({ status: GUEST, answers: [], currentQuestion: 0 }),
+    addUserAnswer: (state, action: PayloadAction<AnswerType>) => {
       if (state.status === GUEST) state.answers.push(action.payload);
     },
   },
@@ -30,6 +30,7 @@ export const userSlice = createSlice({
           return {
             status: GUEST,
             answers: action.payload.answers,
+            currentQuestion: action.payload.currentQuestion,
           };
           // state.status = GUEST;
           // state.answers = action.payload.answers;
@@ -38,6 +39,7 @@ export const userSlice = createSlice({
           status: AUTHORIZED,
           email: action.payload.email,
           id: action.payload.id,
+          currentQuestion: action.payload.currentQuestion,
         };
       })
       .addCase(checkUserActionThunk.pending, (state) => {
@@ -51,6 +53,7 @@ export const userSlice = createSlice({
           return {
             status: GUEST,
             answers: action.payload.answers,
+            currentQuestion: action.payload.currentQuestion,
           };
           // state.status = GUEST;
           // state.answers = action.payload.answers;
@@ -59,6 +62,7 @@ export const userSlice = createSlice({
           status: AUTHORIZED,
           email: action.payload.email,
           id: action.payload.id,
+          currentQuestion: action.payload.currentQuestion,
         };
       });
   },

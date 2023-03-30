@@ -4,6 +4,7 @@ import StartIcon from '@mui/icons-material/Start';
 import { useAppDispatch, useAppSelector } from '../../../features/redux/hooks';
 import WordCloud from '../../WordCloud/WordCloud';
 import { setCurrentQuestion } from '../../../features/redux/slices/wordsSlice';
+import { wsSendCurrentQuestion } from '../../../features/actions/wsActions';
 
 export default function WordCloudPage(): JSX.Element {
   const { displayedWords, allQuestions, currentQuestion } = useAppSelector((store) => store.words);
@@ -16,12 +17,16 @@ export default function WordCloudPage(): JSX.Element {
       {currentQuestion < allQuestions.length - 1 && (
         <Button
           variant="outlined"
-          onClick={() => dispatch(setCurrentQuestion(currentQuestion + 1))}
+          onClick={() => {
+            dispatch(wsSendCurrentQuestion(currentQuestion + 1));
+            dispatch(setCurrentQuestion(currentQuestion + 1));
+          }}
         >
-          <StartIcon />
+          {/* <StartIcon /> */}
+          Следующий вопрос
         </Button>
       )}
-      <WordCloud words={displayedWords} />
+      <WordCloud words={allQuestions[currentQuestion].answers} />
     </Container>
   );
 }

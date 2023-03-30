@@ -1,3 +1,4 @@
+import type { AnswerType } from '../../types/wordTypes';
 import type {
   WsCloseType,
   WsConnectType,
@@ -5,8 +6,10 @@ import type {
   WsMessageSendType,
   WsMessageSetType,
   WsSendAnswer,
+  WsSendCurrentQuestion,
 } from '../../types/wsTypes';
 import {
+  SOCKET_SEND_CURRENT_QUESTION,
   SOCKET_SEND_ANSWER,
   SOCKET_CONNECT,
   SOCKET_MESSAGE_SEND,
@@ -32,12 +35,17 @@ export const wsMessageSetAction = (payload: string): WsMessageSetType => ({
   payload,
 });
 
-export const wsMessageSendAction = (payload: string): WsMessageSendType => ({
+export const wsMessageSendAction = (payload: AnswerType): WsMessageSendType => ({
   type: SOCKET_MESSAGE_SEND,
   payload,
 });
 
-export const wsSendAnswer = (payload: string): WsSendAnswer => ({
+export const wsSendAnswer = (payload: AnswerType): WsSendAnswer => ({
   type: SOCKET_SEND_ANSWER,
+  payload,
+});
+
+export const wsSendCurrentQuestion = (payload: number): WsSendCurrentQuestion => ({
+  type: SOCKET_SEND_CURRENT_QUESTION,
   payload,
 });

@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
+  AnswerType,
   EditQuestionFormType,
   QuestionType,
   WordsSliceType,
@@ -35,6 +36,12 @@ export const wordsSlice = createSlice({
       const foundWord = currentAnswers.find((word) => word.text === action.payload);
       if (foundWord) foundWord.size += 1;
       else currentAnswers.push({ text: action.payload, size: 1 });
+    },
+    addWordFromBackend: (state, action: PayloadAction<AnswerType>) => {
+      const targetAnswers = state.allQuestions[action.payload.questionIndex].answers;
+      const foundWord = targetAnswers.find((word) => word.text === action.payload.text);
+      if (foundWord) foundWord.size += 1;
+      else targetAnswers.push({ text: action.payload.text, size: 1 });
     },
     addWordAndDisplay: (state, action: PayloadAction<WordType['text']>) => {
       const currentAnswers = state.allQuestions[state.currentQuestion].answers;
@@ -76,6 +83,7 @@ export const {
   addEmptyQuestion,
   removeLastQuestion,
   setCurrentQuestion,
+  addWordFromBackend
 } = wordsSlice.actions;
 
 export default wordsSlice.reducer;
