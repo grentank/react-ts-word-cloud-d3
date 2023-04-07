@@ -14,6 +14,17 @@ export default function WordCloudPage(): JSX.Element {
       <Typography variant="h2" component="div">
         {allQuestions[currentQuestion].question}
       </Typography>
+      {currentQuestion > 0 && (
+        <Button
+          variant="outlined"
+          onClick={() => {
+            dispatch(wsSendCurrentQuestion(currentQuestion - 1));
+            dispatch(setCurrentQuestion(currentQuestion - 1));
+          }}
+        >
+          Предыдущий вопрос
+        </Button>
+      )}
       {currentQuestion < allQuestions.length - 1 && (
         <Button
           variant="outlined"
@@ -22,7 +33,7 @@ export default function WordCloudPage(): JSX.Element {
             dispatch(setCurrentQuestion(currentQuestion + 1));
           }}
         >
-          {/* <StartIcon /> */}
+          <StartIcon />
           Следующий вопрос
         </Button>
       )}

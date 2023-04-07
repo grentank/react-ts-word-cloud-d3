@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
 const store = require('session-file-store');
+const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
 require('dotenv').config();
@@ -40,6 +41,8 @@ app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(sessionConfig);
 app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
+
 app.use((req, res, next) => {
   res.locals.currentQuestion = map.get('config').state.currentQuestion;
   next();
@@ -157,6 +160,10 @@ wss.on('connection', (ws, request) => {
   ws.on('close', () => {
     map.delete(user.id);
   });
+});
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
 });
 
 server.listen(PORT, () => {
