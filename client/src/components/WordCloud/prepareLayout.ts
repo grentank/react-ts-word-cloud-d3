@@ -8,7 +8,7 @@ export default function prepareLayout({
   size = [500, 500],
   rotate = () => Math.floor(Math.random() * 2) * 90,
   font = 'Impact',
-  fontSize = (word) => Math.sqrt(word.size * 10) * 8 || 1, // Здесь можно использовать log2
+  fontSize = (word) => (word?.size ? Math.sqrt(word.size * 10) * 8 : 1), // Здесь можно использовать log2
 }: WordCloudProps): layout.Cloud<Word> {
   return (
     cloud()
