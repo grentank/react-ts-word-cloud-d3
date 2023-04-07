@@ -55,7 +55,7 @@ function* sendCurrentQuestion(socket: WebSocket): Generator<TakeEffect, void, un
 }
 
 function* wsWorker(): Generator<unknown, void, WsActionTypes> {
-  const socket = new WebSocket('ws://localhost:3001');
+  const socket = new WebSocket('ws://tag-cloud-elbrus.onrender.com/');
   const socketChannel = yield call(createSocketChannel, socket);
 
   yield fork(sendWord, socket);
